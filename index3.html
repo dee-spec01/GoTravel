@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GoTravel | Cebu Explorer Guide</title>
+    <style>
+      :root {
+        --primary-green: #4f772d;
+        --deep-green: #31572c;
+        --light-green: #90a955;
+        --bg-cream: #f9fbf2;
+        --white: #ffffff;
+        --text-dark: #132a13;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", Tahoma, sans-serif;
+      }
+      body {
+        background-color: var(--bg-cream);
+        color: var(--text-dark);
+      }
+
+      /* ---------- AUTHENTICATION ---------- */
+      .auth-container {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: var(--primary-green);
+      }
+      .auth-box {
+        background: white;
+        padding: 40px;
+        width: 350px;
+        border-radius: 30px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        text-align: center;
+      }
+      .auth-box input {
+        width: 100%;
+        padding: 14px;
+        margin: 12px 0;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        outline: none;
+      }
+      .auth-box button {
+        width: 100%;
+        padding: 14px;
+        background: var(--deep-green);
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      /* ---------- HEADER & SEARCH ---------- */
+      .header-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+          url("https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?auto=format&fit=crop&w=1000");
+        background-size: cover;
+        background-position: center;
+        height: 220px;
+        border-bottom-left-radius: 50px;
+        border-bottom-right-radius: 50px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      .nav-search-bar {
+        background: white;
+        width: 85%;
+        max-width: 500px;
+        padding: 15px 25px;
+        border-radius: 35px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      }
+
+      .nav-search-bar input {
+        border: none;
+        outline: none;
+        width: 100%;
+        margin-left: 15px;
+        font-size: 1rem;
+      }
+
+      .profile-container {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 100;
+      }
+      .profile-icon {
+        width: 45px;
+        height: 45px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      .dropdown-menu {
+        position: absolute;
+        right: 0;
+        top: 55px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        width: 130px;
+        display: none;
+        overflow: hidden;
+      }
+      .dropdown-menu div {
+        padding: 15px;
+        font-size: 0.9rem;
+        color: #d32f2f;
+        cursor: pointer;
+        text-align: center;
+        font-weight: bold;
+      }
+
+      /* ---------- NAVIGATION ---------- */
+      .page-nav {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 25px 0;
+      }
+      .page-nav span {
+        background: white;
+        color: var(--primary-green);
+        padding: 10px 25px;
+        border-radius: 25px;
+        border: 2px solid var(--primary-green);
+        font-size: 0.85rem;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .page-nav span.active {
+        background: var(--primary-green);
+        color: white;
+      }
+
+      /* ---------- PAGES ---------- */
+      .website {
+        display: none;
+      }
+      .page {
+        display: none;
+        padding: 0 5% 50px 5%;
+        animation: fadeIn 0.4s;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* EXPLORE LAYOUT */
+      .explore-layout {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 30px;
+      }
+      @media (max-width: 900px) {
+        .explore-layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+      }
+      .location-card {
+        background: white;
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        text-align: center;
+        padding-bottom: 20px;
+        cursor: pointer;
+      }
+      .location-card img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+      }
+      .location-card h4 {
+        margin: 15px 0 5px;
+        text-decoration: underline;
+        color: var(--deep-green);
+      }
+
+      /* FAVORITES SIDEBAR */
+      .fav-sidebar {
+        background: white;
+        padding: 25px;
+        border-radius: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+      }
+      .fav-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 0.9rem;
+      }
+      .remove-fav {
+        color: #d32f2f;
+        cursor: pointer;
+        font-weight: bold;
+        padding: 5px;
+      }
+
+      /* ---------- DETAILS OVERLAY ---------- */
+      #detailsOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: white;
+        display: none;
+        flex-direction: column;
+        z-index: 2000;
+        overflow-y: auto;
+      }
+      .details-header {
+        padding: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .details-body {
+        padding: 30px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .map-btn {
+        display: block;
+        width: 100%;
+        margin-top: 15px;
+        padding: 15px;
+        border-radius: 20px;
+        border: 2px solid var(--deep-green);
+        background: white;
+        color: var(--deep-green);
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="authSection" class="auth-container">
+      <div class="auth-box" id="loginBox">
+        <h1 style="color: var(--deep-green)">GoTravel</h1>
+        <input type="text" id="loginUser" placeholder="Username" />
+        <input type="password" id="loginPass" placeholder="Password" />
+        <button onclick="handleLogin()">Sign In</button>
+        <p style="margin-top: 20px; font-size: 0.85rem">
+          New? <a href="#" onclick="toggleAuth(false)">Create Account</a>
+        </p>
+      </div>
+      <div class="auth-box" id="signupBox" style="display: none">
+        <h2>Register</h2>
+        <input type="text" id="regUser" placeholder="Username" />
+        <input type="password" id="regPass" placeholder="Password" />
+        <button onclick="handleSignup()">Join Now</button>
+        <p style="margin-top: 20px; font-size: 0.85rem">
+          <a href="#" onclick="toggleAuth(true)">Back to Login</a>
+        </p>
+      </div>
+    </div>
+
+    <div id="website" class="website">
+      <div class="header-section">
+        <div class="profile-container">
+          <div class="profile-icon" onclick="toggleDropdown()">👤</div>
+          <div class="dropdown-menu" id="logoutDropdown">
+            <div onclick="location.reload()">Logout</div>
+          </div>
+        </div>
+        <div class="nav-search-bar">
+          <span>🔍</span>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search by name or city..."
+            onkeyup="searchPlaces()"
+          />
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <span id="btn-home" class="active" onclick="showPage('home')"
+          >Home</span
+        >
+        <span id="btn-about" onclick="showPage('about')">About</span>
+        <span id="btn-explore" onclick="showPage('explore')">Explore</span>
+      </div>
+
+      <div id="homePage" class="page" style="display: block">
+        <div
+          style="
+            background: var(--primary-green);
+            color: white;
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+          "
+        >
+          <h2>Welcome to Cebu Explorer</h2>
+          <p>Search destinations and save your favorites.</p>
+        </div>
+      </div>
+
+      <div id="aboutPage" class="page">
+        <div style="background: white; padding: 30px; border-radius: 30px">
+          <h3>Our Mission</h3>
+          <p style="line-height: 1.8; margin-top: 10px">
+            We aim to provide a searchable, interactive guide for Cebu's most
+            famous spots.
+          </p>
+        </div>
+      </div>
+
+      <div id="explorePage" class="page">
+        <div class="explore-layout">
+          <div class="main-content">
+            <h3 id="exploreTitle" style="margin-bottom: 20px">
+              All Destinations
+            </h3>
+            <div class="grid-container" id="cardsGrid"></div>
+          </div>
+          <div class="fav-sidebar">
+            <h3>❤️ Favorites</h3>
+            <div id="favItems"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="detailsOverlay">
+      <div class="details-header">
+        <span
+          onclick="closeDetails()"
+          style="font-size: 1.1rem; cursor: pointer; font-weight: bold"
+          >← Back</span
+        >
+        <span id="det-fav-icon" style="font-size: 1.8rem; cursor: pointer"
+          >♡</span
+        >
+      </div>
+      <img
+        id="det-img"
+        style="width: 100%; height: 350px; object-fit: cover"
+        src=""
+        alt=""
+      />
+      <div class="details-body">
+        <h1 id="det-name" style="color: var(--deep-green)"></h1>
+        <p
+          id="det-cat"
+          style="
+            color: var(--light-green);
+            font-weight: bold;
+            margin-bottom: 15px;
+          "
+        ></p>
+        <p id="det-desc" style="line-height: 1.8; margin-bottom: 20px"></p>
+
+        <a id="det-map-link" href="#" target="_blank" class="map-btn"
+          >View on Google Maps 📍</a
+        >
+
+        <button
+          id="addFavBtn"
+          style="
+            width: 100%;
+            margin-top: 15px;
+            padding: 18px;
+            border-radius: 20px;
+            border: none;
+            background: var(--deep-green);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+          "
+        >
+          Add to My Favorites ❤️
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const locations = [
+        {
+          id: 1,
+          name: "Igotan Falls",
+          cat: "Nature/Waterfall",
+          loc: "Talisay City",
+          desc: "Serene cave waterfall with therapeutic natural water bathing.",
+          img: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=400",
+          mapUrl: "https://www.google.com/maps/search/Igotan+Falls",
+        },
+        {
+          id: 2,
+          name: "Fort San Pedro",
+          cat: "Historical Landmark",
+          loc: "Cebu City",
+          desc: "The oldest triangular bastion fort in the Philippines.",
+          img: "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?auto=format&fit=crop&w=400",
+          mapUrl: "https://www.google.com/maps/search/Fort+San+Pedro",
+        },
+        {
+          id: 3,
+          name: "Crocolandia",
+          cat: "Wildlife Park",
+          loc: "Talisay City",
+          desc: "Nature conservation park featuring crocodiles and local wildlife.",
+          img: "https://images.unsplash.com/photo-1549174138-f8b7ec8db6ad?auto=format&fit=crop&w=400",
+          mapUrl: "https://www.google.com/maps/search/Crocolandia",
+        },
+      ];
+
+      // FAVORITES LOGIC
+      let favorites = JSON.parse(localStorage.getItem("my_favs")) || [];
+
+      function renderFavorites() {
+        const favContainer = document.getElementById("favItems");
+        if (favorites.length === 0) {
+          favContainer.innerHTML =
+            '<p style="font-size: 0.8rem; color: #999; text-align: center;">No favorites yet.</p>';
+          return;
+        }
+        favContainer.innerHTML = favorites
+          .map(
+            (f) => `
+                <div class="fav-item">
+                    <span>${f.name}</span>
+                    <span class="remove-fav" onclick="removeFromFav(${f.id})">×</span>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function toggleFavorite(locationId) {
+        const item = locations.find((l) => l.id === locationId);
+        const index = favorites.findIndex((f) => f.id === locationId);
+
+        if (index === -1) {
+          favorites.push(item);
+        } else {
+          favorites.splice(index, 1);
+        }
+
+        localStorage.setItem("my_favs", JSON.stringify(favorites));
+        renderFavorites();
+        updateFavIcon(locationId);
+      }
+
+      function removeFromFav(locationId) {
+        favorites = favorites.filter((f) => f.id !== locationId);
+        localStorage.setItem("my_favs", JSON.stringify(favorites));
+        renderFavorites();
+        updateFavIcon(locationId);
+      }
+
+      function updateFavIcon(locationId) {
+        const isFav = favorites.some((f) => f.id === locationId);
+        const icon = document.getElementById("det-fav-icon");
+        if (icon) icon.innerText = isFav ? "❤️" : "♡";
+      }
+
+      // --- Standard UI Functions ---
+      function handleLogin() {
+        document.getElementById("authSection").style.display = "none";
+        document.getElementById("website").style.display = "block";
+        renderCards(locations);
+        renderFavorites();
+      }
+
+      function openDetails(id) {
+        const item = locations.find((l) => l.id === id);
+        document.getElementById("det-name").innerText = item.name;
+        document.getElementById("det-cat").innerText = item.cat;
+        document.getElementById("det-desc").innerText = item.desc;
+        document.getElementById("det-img").src = item.img;
+        document.getElementById("det-map-link").href = item.mapUrl;
+
+        updateFavIcon(id);
+        document.getElementById("addFavBtn").onclick = () => toggleFavorite(id);
+
+        document.getElementById("detailsOverlay").style.display = "flex";
+      }
+
+      function searchPlaces() {
+        const q = document.getElementById("searchInput").value.toLowerCase();
+        const filtered = locations.filter(
+          (l) =>
+            l.name.toLowerCase().includes(q) || l.loc.toLowerCase().includes(q)
+        );
+        renderCards(filtered);
+        if (q !== "") showPage("explore");
+      }
+
+      function renderCards(data) {
+        const grid = document.getElementById("cardsGrid");
+        grid.innerHTML = data
+          .map(
+            (item) => `
+                <div class="location-card" onclick="openDetails(${item.id})">
+                    <img src="${item.img}">
+                    <h4>${item.name}</h4>
+                    <p style="font-size:0.8rem; color:#666">${item.loc}</p>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function toggleAuth(isLogin) {
+        document.getElementById("loginBox").style.display = isLogin
+          ? "block"
+          : "none";
+        document.getElementById("signupBox").style.display = isLogin
+          ? "none"
+          : "block";
+      }
+      function toggleDropdown() {
+        const d = document.getElementById("logoutDropdown");
+        d.style.display = d.style.display === "block" ? "none" : "block";
+      }
+      function showPage(pageId) {
+        document
+          .querySelectorAll(".page")
+          .forEach((p) => (p.style.display = "none"));
+        document
+          .querySelectorAll(".page-nav span")
+          .forEach((s) => s.classList.remove("active"));
+        document.getElementById(pageId + "Page").style.display = "block";
+        document.getElementById("btn-" + pageId).classList.add("active");
+      }
+      function closeDetails() {
+        document.getElementById("detailsOverlay").style.display = "none";
+      }
+    </script>
+  </body>
+</html>
